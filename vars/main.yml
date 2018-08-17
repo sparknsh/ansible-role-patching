@@ -1,1 +1,4 @@
 ---
+patching_repo_cache_valid_time: 3600
+patching_repo_path: "/etc/yum.repos.d"
+patching_custom_repos: []

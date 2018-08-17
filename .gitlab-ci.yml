@@ -70,11 +70,11 @@ GitHub:
   stage: Deploy
   before_script:
     - "VERSION=$(grep 'Version:' README.md | cut -d ' ' -f3 | awk '{print substr($0,1,5)}')"
-    - git config --global user.email "${GITLAB_USER_EMAIL}"
-    - git config --global user.name "${GITLAB_USER_LOGIN}"
+    - git config --global user.email "${GITEMAIL}"
+    - git config --global user.name "${GITUSER}"
     - git config --global push.followTags true
-    - git clone git@gitlab.com:${GITLAB_USER_LOGIN}/${CI_PROJECT_NAME}.git WORKING
-    - git clone git@github.com:${GITLAB_USER_LOGIN}/${CI_PROJECT_NAME}.git DEPLOY
+    - git clone git@gitlab.com:${GITUSER}/${CI_PROJECT_NAME}.git WORKING
+    - git clone git@github.com:${GITUSER}/${CI_PROJECT_NAME}.git DEPLOY
     - cd ${CI_PROJECT_DIR}/WORKING
     - git checkout ${CI_COMMIT_SHA:0:8}
     - rm -Rf ${CI_PROJECT_DIR}/WORKING/.git

@@ -1,0 +1,129 @@
+---
+
+- name: Check that HTTPS transport is available to APT
+  apt: name="apt-transport-https" state=present
+  when: patching_https
+
+- name: Load custom sources.list
+  template:
+    src: "{{ ansible_os_family }}/{{ ansible_distribution | lower }}.list.j2"
+    dest: "/etc/apt/sources.list"
+    owner: root
+    group: root
+    mode: 0644
+  register: config_updated
+
+- name: Add backports.list
+  template:
+    src: "{{ ansible_os_family }}/backports.list.j2"
+    dest: "{{ patching_repo_path }}/backports.list"
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - patching_repo_backports
+    - ansible_distribution != 'Ubuntu'
+
+- name: Remove backports.list
+  file:
+    path: "{{ patching_repo_path }}/backports.list"
+    state: absent
+  when: patching_repo_backports == False
+
+- name: Add experimental.list
+  template:
+    src: "{{ ansible_os_family }}/experimental.list.j2"
+    dest: "{{ patching_repo_path }}/experimental.list"
+    owner: root
+    group: root
+    mode: 0644
+  when: 
+    - patching_repo_experimental
+    - ansible_distribution != 'Ubuntu'
+
+- name: Remove experimental.list
+  file:
+    path: "{{ patching_repo_path }}/experimental.list"
+    state: absent
+  when: patching_repo_experimental == False
+
+- name: Add custom repos
+  template:
+    src: "{{ ansible_os_family }}/custom.list.j2"
+    dest: "{{ patching_repo_path }}/{{ item.name | lower | replace(' ', '') ~ '.list' }}"
+    owner: root
+    group: root
+    mode: 0644
+  when: item.state|default('present') != 'absent'
+  with_items: "{{ patching_custom_repos }}"
+
+- name: Add Custom repo key
+  apt_key:
+    url: "{{ item.key }}"
+    state: present
+  when: item.state|default('present') != 'absent'
+  with_items: "{{ patching_custom_repos }}"
+
+- name: Remove custom repos
+  file:
+    path: "{{ patching_repo_path }}/{{ item.name | lower | replace(' ', '') ~ '.list' }}"
+    state: absent
+  when: item.state|default('present') == 'absent'
+  with_items: "{{ patching_custom_repos }}"
+
+- name: Remove Custom repo key
+  apt_key:
+    url: "{{ item.key }}"
+    state: absent
+  when: item.state|default('present') == 'absent'
+  with_items: "{{ patching_custom_repos }}"
+
+- name: Update APT cache
+  apt: 
+    update_cache: true 
+    cache_valid_time: "{{ 0 if config_updated is defined and config_updated.changed else patching_repo_cache_valid_time }}"
+
+- name: Update APT packages
+  apt:
+    state: latest
+    upgrade: "no"
+  when: patching_upgrade_all != True
+
+- name: Upgrade APT packages
+  apt:
+    upgrade: "dist"
+  when: patching_upgrade_all
+
+- name: Generate list of installed and updated packages
+  shell: grep -E "^$(date +%Y-%m-%d).+ (install|upgrade) " /var/log/dpkg.log |cut -d " " -f 3-5
+  changed_when: false
+  register: result
+
+- name: List installed and updated packages
+  debug: msg="{{ result.stdout_lines }}"
+
+- name: Clean APT cache
+  apt:    
+    autoclean: yes 
+  when: patching_repo_clean
+
+- name: Remove APT packages and files
+  apt:
+    autoremove: yes
+    purge: yes
+  when: patching_repo_clean
+
+- name: Check if reboot is required
+  stat:
+    path: /var/run/reboot-required
+  register: reboot_required
+  when: patching_reboot_server
+
+- name: Restart server
+  shell: sleep 1 && shutdown -r now "Reboot triggered by Ansible" && sleep 1
+  async: 1
+  poll: 0
+  ignore_errors: true
+  when:
+    - patching_reboot_server
+    - reboot_required.stat.exists == true

@@ -1,0 +1,30 @@
+---
+
+# Variable setup.
+- name: Include OS-specific variables.
+  include_vars: "{{ ansible_os_family }}.yml"
+  
+# OS tasks.
+- name: Debain Fmaily
+  include_tasks: Debian.yml
+  when: ansible_os_family == 'Debian'
+
+- name: RedHat Fmaily
+  include_tasks: RedHat.yml
+  when: ansible_os_family == 'RedHat'
+
+- name: Fedora Fmaily
+  include_tasks: Fedora.yml
+  when: ansible_distribution == 'Fedora'
+
+- name: FreeBSD Fmaily
+  include_tasks: FreeBSD.yml
+  when: ansible_os_family == 'FreeBSD'
+
+- name: OpenBSD Fmaily
+  include_tasks: OpenBSD.yml
+  when: ansible_os_family == 'OpenBSD'
+
+- name: Archlinux Fmaily
+  include_tasks: Archlinux.yml
+  when: ansible_os_family == 'Archlinux'

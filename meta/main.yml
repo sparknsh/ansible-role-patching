@@ -1,0 +1,35 @@
+galaxy_info:
+  role_name: patching
+  description: Server update & upgrade role.
+  author: sparknsh
+  company: Rebel Media, Inc.
+  license: MIT
+  min_ansible_version: 1.5
+  github_branch: master
+  platforms:
+    - name: EL
+      versions:
+      - 6
+      - 7
+    - name: Debian
+      versions:
+      - wheezy
+      - jessie
+      - stretch
+    - name: Ubuntu
+      versions:
+      - precise
+      - trusty
+      - xenial
+      - bionic
+  galaxy_tags: 
+    - system
+    - development
+    - cloud
+    - apt
+    - yum
+    - update
+    - upgrade
+    - patch
+
+dependencies: []

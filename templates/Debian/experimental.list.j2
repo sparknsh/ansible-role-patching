@@ -1,0 +1,2 @@
+deb {{ 'http://' if not patching_https else 'https://' }}{{ patching_mirror_url }}/ experimental main
+{{ '# ' if not patching_repo_source else '' }}deb-src {{ 'http://' if not patching_https else 'https://' }}{{ patching_mirror_url }}/ experimental main

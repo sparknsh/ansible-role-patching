@@ -1,0 +1,7 @@
+---
+patching_mirror_url: "{{ ansible_distribution  | lower }}.osuosl.org/{{ ansible_distribution  | lower }}"
+patching_repo_path: "/etc/apt/sources.list.d"
+patching_repo_backports: True
+patching_repo_experimental: True
+patching_repo_contrib_nonfree: True
+patching_repo_cache_valid_time: 3600

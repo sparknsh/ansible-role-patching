@@ -1,0 +1,73 @@
+---
+
+- name: Add custom repos
+  template:
+    src: "{{ ansible_os_family }}/custom.repo.j2"
+    dest: "{{ patching_repo_path }}/{{ item.name | lower | replace(' ', '') ~ '.repo' }}"
+    force: yes
+    owner: root
+    group: root
+    mode: 0644
+  when: item.state | default('present') != 'absent'
+  with_items: "{{ patching_custom_repos }}"
+
+- name: Remove custom repos
+  file:
+    path: "{{ patching_repo_path }}/{{ item.name | lower | replace(' ', '') ~ '.repo' }}"
+    state: absent
+  when: item.state | default('present') == 'absent'
+  with_items: "{{ patching_custom_repos }}"
+
+- name: Clean YUM cache
+  command: yum clean all
+  args:
+    warn: false
+  changed_when: false
+
+- name: Update YUM packages maked security
+  yum:
+    name: '*'
+    state: latest
+    security: "yes"
+  when: 
+    - patching_update_security == True
+    - patching_upgrade_all != True
+
+- name: Update YUM packages
+  yum:
+    name: '*'
+    state: latest
+    update_only: "yes"
+  when: 
+    - patching_upgrade_all != True
+    - patching_update_security != True
+
+- name: Upgrade YUM packages
+  yum:
+    name: '*'
+    state: latest
+  when: 
+    - patching_upgrade_all == True
+    - patching_update_security != True
+
+- name: Generate list of installed and updated packages
+  shell: grep -E "^$(date +%Y-%m-%d).+ (Installed|Updated) " /var/log/yum.log |cut -d " " -f 3-5
+  changed_when: false
+  register: result
+
+- name: List installed and updated packages
+  debug: msg="{{ result.stdout_lines }}"
+
+- name: Check if reboot is required
+  shell: if [ $(rpm -q kernel|tail -n 1) != kernel-$(uname -r) ]; then echo 'True'; else echo 'False'; fi
+  register: reboot_required
+  when: patching_reboot_server
+
+- name: Restart server
+  shell: sleep 1 && shutdown -r now "Reboot triggered by Ansible" && sleep 1
+  async: 1
+  poll: 0
+  ignore_errors: true
+  when: 
+    - patching_reboot_server
+    - reboot_required.stdout == True

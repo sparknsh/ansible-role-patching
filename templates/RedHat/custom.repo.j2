@@ -1,0 +1,7 @@
+[{{ item.name | lower | replace(" ", "") }}]
+name={{ item.name }}
+baseurl={{ item.baseurl }}
+priority={{ item.priority }}
+gpgcheck={{ item.gpgcheck  | default('1') }}
+enabled={{ item.enabled  | default('1') }}
+gpgkey={{ item.gpgkey }}

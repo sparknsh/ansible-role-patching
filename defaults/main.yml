@@ -1,0 +1,8 @@
+---
+patching_reboot_server: False
+patching_https: False
+patching_repo_clean: True
+patching_repo_source: True
+patching_upgrade_all: False
+patching_update_security: False
+patching_custom_repos: []

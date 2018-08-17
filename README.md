@@ -1,10 +1,10 @@
 # Ansible Role: Patching
 
-#### Version: 1.0.0
+#### Version: 1.0.1
 
 [![pipeline status](https://gitlab.com/sparknsh/ansible-role-patching/badges/master/pipeline.svg)](https://gitlab.com/sparknsh/ansible-role-patching/commits/master)
-[![Ansible Role](https://img.shields.io/ansible/role/28780.svg)](https://galaxy.ansible.com/sparknsh/patching)
-[![Ansible Role](https://img.shields.io/ansible/role/d/28780.svg)](https://galaxy.ansible.com/sparknsh/patching)
+[![Ansible Role](https://img.shields.io/ansible/role/29003.svg)](https://galaxy.ansible.com/sparknsh/patching)
+[![Ansible Role](https://img.shields.io/ansible/role/d/29003.svg)](https://galaxy.ansible.com/sparknsh/patching)
 
 Development of this project is managed in a private repository then pushed out to [GitLab](https://gitlab.com/sparknsh/ansible-role-patching) and [GitHub](https://github.com/sparknsh/ansible-role-patching) when we have a new version for you. If you have any issues please contact [sparknsh](https://www.sparknsh.com/contact?type=issue&name=ansible-role-patching)
 

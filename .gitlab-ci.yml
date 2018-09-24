@@ -20,11 +20,6 @@ stages:
   tags:
     - gce
 
-Debian 7:
-  variables:
-    OS: "debian7"
-  <<: *Test_Role
-
 Debian 8:
   variables:
     OS: "debian8"
@@ -33,11 +28,6 @@ Debian 8:
 Debian 9:
   variables:
     OS: "debian9"
-  <<: *Test_Role
-
-Ubuntu 12.04:
-  variables:
-    OS: "ubuntu12.04"
   <<: *Test_Role
 
 Ubuntu 14.04:

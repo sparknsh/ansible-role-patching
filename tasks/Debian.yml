@@ -48,5 +48,21 @@
     path: /var/run/reboot-required
   register: reboot_required
   when: patching_reboot_server
-  notify:
-    - Restart server
+
+- name: Restart server
+  shell: sleep 1 && shutdown -r now "Reboot triggered by Ansible" && sleep 1
+  async: 1
+  poll: 0
+  ignore_errors: True
+  become: yes
+  when: 
+    - patching_reboot_server
+    - reboot_required.stat.exists == true
+
+- name: Wait for Reboot
+  wait_for_connection:
+    timeout: 6000
+    delay: 20
+  when: 
+    - patching_reboot_server
+    - reboot_required.stat.exists == true

@@ -1,10 +1,104 @@
 ---
-  
-# OS tasks.
+
 - name: Debain Fmaily
-  include_tasks: Debian.yml
+  block:
+
+    - name: ATP Update cache
+      apt:
+        update_cache: true
+        cache_valid_time: "{{ patching_apt_cache }}"
+
+    - name: APT Upgrade packages
+      apt:
+        state: latest
+        upgrade: true
+      when: patching_upgrade_all != true
+
+    - name: APT Dist Upgrade packages
+      apt:
+        state: latest
+        upgrade: "dist"
+      when: patching_upgrade_all
+
+    - name: APT Clean cache
+      apt:
+        autoclean: true
+      when: patching_repo_clean
+
+    - name: APT Remove packages and files
+      apt:
+        autoremove: true
+        purge: true
+      when: patching_repo_clean
+
   when: ansible_os_family == 'Debian'
 
 - name: RedHat Fmaily
-  include_tasks: RedHat.yml
+  block:
+
+    - name: YUM Clean cache
+      command: yum clean all
+      args:
+        warn: false
+      changed_when: false
+
+    - name: YUM Update packages maked security
+      yum:
+        name: '*'
+        state: latest
+        security: true
+      when:
+        - patching_update_security == true
+        - patching_upgrade_all != true
+
+    - name: YUM Update packages
+      yum:
+        name: '*'
+        state: latest
+        update_only: true
+      when:
+        - patching_upgrade_all != true
+        - patching_update_security != true
+
+    - name: YUM Upgrade packages
+      yum:
+        name: '*'
+        state: latest
+      when:
+        - patching_upgrade_all == true
+        - patching_update_security != true
+
   when: ansible_os_family == 'RedHat'
+
+- name: Output Packages
+  block:
+
+    - name: APT List Installed & Updated Packages
+      block:
+
+        - name: APT generate list of installed and updated packages
+          shell: grep -Ew "^$(date +%Y-%m-%d).+ (install|upgrade)" /var/log/dpkg.log | cut -d " " -f 3-4
+          changed_when: false
+          register: results
+
+        - name: APT List Installed & Updated Packages
+          debug:
+            msg: "{{ results.stdout_lines }}"
+
+      when: ansible_os_family == 'Debian'
+
+    - name: YUM List Installed & Updated Packages
+      block:
+
+        - name: YUM generate list of installed and updated packages
+          shell: grep -E "^$(date +"%b %d").+ (Installed|Updated)" /var/log/yum.log | cut -d " " -f 4-5
+          changed_when: false
+          register: results
+
+        - name: YUM List Installed & Updated Packages
+          debug:
+            msg: "{{ results.stdout_lines }}"
+
+      when: ansible_os_family == 'RedHat'
+
+  when: patching_audit_packages

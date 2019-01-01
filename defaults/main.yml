@@ -1,5 +1,6 @@
 ---
-patching_reboot_server: False
-patching_repo_clean: True
-patching_upgrade_all: False
-patching_update_security: False
+
+patching_audit_packages: false
+patching_upgrade_all: false
+patching_repo_clean: true
+patching_update_security: false

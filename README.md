@@ -1,6 +1,6 @@
 # Ansible Role: Patching
 
-#### Version: 1.1.0
+#### Version: 1.1.1
 
 [![](https://img.shields.io/badge/role-sparknsh.patching-blue.svg)](https://galaxy.ansible.com/sparknsh/patching)
 

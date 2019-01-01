@@ -12,7 +12,7 @@
       apt:
         state: latest
         upgrade: true
-      when: patching_upgrade_all != true
+      when: not patching_upgrade_all
 
     - name: APT Dist Upgrade packages
       apt:
@@ -48,8 +48,8 @@
         state: latest
         security: true
       when:
-        - patching_update_security == true
-        - patching_upgrade_all != true
+        - patching_update_security
+        - not patching_upgrade_all
 
     - name: YUM Update packages
       yum:
@@ -57,16 +57,16 @@
         state: latest
         update_only: true
       when:
-        - patching_upgrade_all != true
-        - patching_update_security != true
+        - not patching_upgrade_all
+        - not patching_update_security
 
     - name: YUM Upgrade packages
       yum:
         name: '*'
         state: latest
       when:
-        - patching_upgrade_all == true
-        - patching_update_security != true
+        - patching_upgrade_all
+        - not patching_update_security
 
   when: ansible_os_family == 'RedHat'
 

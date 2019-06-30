@@ -1,0 +1,46 @@
+---
+
+- name: Patching | ATP - Update cache
+  apt:
+    update_cache: true
+
+- name: Patching | APT - Upgrade packages
+  apt:
+    upgrade: true
+  when:
+    - not patching__upgrade_all | bool
+
+- name: Patching | APT - Dist Upgrade packages
+  apt:
+    upgrade: "dist"
+  when:
+    - patching__upgrade_all | bool
+
+- name: Patching | APT - Clean cache
+  apt:
+    autoclean: true
+  when:
+    - patching__repo_clean | bool
+
+- name: Patching | APT - Remove packages and files
+  apt:
+    autoremove: true
+    purge: true
+  when:
+    - patching__repo_clean | bool
+
+
+- name: Patching |  APT - List Installed & Updated Packages
+  block:
+
+    - name: Patching | APT - generate list of installed and updated packages
+      shell: grep -Ew "^$(date +%Y-%m-%d).+ (install|upgrade)" /var/log/dpkg.log | cut -d " " -f 3-4
+      changed_when: false
+      register: _patching__results
+
+    - name: Patching | APT - List Installed & Updated Packages
+      debug:
+        msg: "{{ _patching__results.stdout_lines }}"
+
+  when:
+    - patching__audit_packages | bool

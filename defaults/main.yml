@@ -1,6 +1,6 @@
 ---
 
-patching_audit_packages: false
-patching_upgrade_all: false
-patching_repo_clean: true
-patching_update_security: false
+patching__audit_packages: false
+patching__upgrade_all: false
+patching__repo_clean: true
+patching__update_security: false

@@ -1,5 +1,1 @@
 ---
-
-patching_apt_cache: 600
-patching_repo_path: "/etc/yum.repos.d"
-patching_custom_repos: []

@@ -1,0 +1,45 @@
+---
+
+- name: Patching | YUM - Clean cache
+  command: yum clean all
+  args:
+    warn: false
+  changed_when: false
+
+- name: Patching | YUM - Update packages maked security
+  yum:
+    name: '*'
+    security: true
+  when:
+    - patching__update_security | bool
+    - not patching__upgrade_all | bool
+
+- name: Patching | YUM - Update packages
+  yum:
+    name: '*'
+    update_only: true
+  when:
+    - not patching__upgrade_all | bool
+    - not patching__update_security | bool
+
+- name: Patching | YUM - Upgrade packages
+  yum:
+    name: '*'
+  when:
+    - patching__upgrade_all | bool
+    - not patching__update_security  | bool
+
+- name: Patching | YUM - List Installed & Updated Packages
+  block:
+
+    - name: Patching | YUM - generate list of installed and updated packages
+      shell: grep -E "^$(date +"%b %d").+ (Installed|Updated)" /var/log/yum.log | cut -d " " -f 4-5
+      changed_when: false
+      register: _patching__results
+
+    - name: Patching | YUM - List Installed & Updated Packages
+      debug:
+        msg: "{{ _patching__results.stdout_lines }}"
+
+  when:
+    - patching__audit_packages | bool

@@ -1,6 +1,6 @@
 # Ansible Role: Patching
 
-#### Version: 1.1.1
+#### Version: 1.2.0
 
 [![](https://img.shields.io/badge/role-sparknsh.patching-blue.svg)](https://galaxy.ansible.com/sparknsh/patching)
 
@@ -11,20 +11,20 @@ Development of this project is managed in a private repository then pushed out t
 Available variables are listed below, along with default values (see `defaults/main.yml`):
 
 ```yaml
-patching_audit_packages: false
+patching__audit_packages: false
 ```
 
 This variable gives you the ability to see what was installed and updated on every server.
 
 ```yaml
-patching_upgrade_all: false
-patching_repo_clean: true
+patching__upgrade_all: false
+patching__repo_clean: true
 ```
 
-By default update will always run. If you want to run a upgrade changing the variable will disable update and run upgrade. `patching_repo_clean` is going to clean up old files off your server.
+By default update will always run. If you want to run a upgrade changing the variable will disable update and run upgrade. `patching__repo_clean` is going to clean up old files off your server.
 
 ```yaml
-patching_update_security: false
+patching__update_security: false
 ```
 
 RHEL distros offer the ability to patch just security updates. Change this to True and just patch all security updates.

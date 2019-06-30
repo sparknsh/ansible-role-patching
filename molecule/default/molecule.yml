@@ -14,19 +14,18 @@ lint:
 platforms:
   - name: ${OS}_${CI_JOB_ID}
     image: sparknsh/ansible:${OS}
-    privileged: true
-    pre_build_image: true
+    command: ${MOLECULE_DOCKER_COMMAND:-""}
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    pre_build_image: true
 
 provisioner:
   name: ansible
   lint:
     name: ansible-lint
-    options:
-      x: ["ANSIBLE0010"]
   playbooks:
-    converge: playbook.yml
+    converge: ${MOLECULE_PLAYBOOK:-playbook.yml}
 
 scenario:
   name: default

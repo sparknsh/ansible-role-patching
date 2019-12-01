@@ -6,7 +6,7 @@
 
 - name: Patching | APT - Upgrade packages
   apt:
-    upgrade: true
+    upgrade: "yes"
   when:
     - not patching__upgrade_all | bool
 
